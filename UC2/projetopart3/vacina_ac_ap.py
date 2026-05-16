@@ -4,10 +4,10 @@ import mysql.connector
 def obter_dados_do_banco(query):
     try:
         conexao = mysql.connector.connect(
-            host="localhost",
+            host="127.0.0.1",
             user="root",
-            password="123456",
-            database="projeto_vacinas"
+            password="",
+            database="projeto_vacinas1"
         )
 
         df = pd.read_sql(query, conexao)
