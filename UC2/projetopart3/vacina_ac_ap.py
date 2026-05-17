@@ -4,10 +4,10 @@ import mysql.connector
 def obter_dados_do_banco(query):
     try:
         conexao = mysql.connector.connect(
-            host="127.0.0.1",
+            host="localhost",
             user="root",
-            password="",
-            database="projeto_vacinas1"
+            password="123456",
+            database="projeto_vacinas"
         )
 
         df = pd.read_sql(query, conexao)
@@ -24,12 +24,14 @@ def obter_dados_do_banco(query):
 
 query_ac = """
 SELECT
-    paciente_endereco_nmMunicipio,
-    paciente_endereco_uf,
+    paciente_endereco_nmMunicipio AS municipio,
+    paciente_endereco_uf AS uf,
     COUNT(*) AS total_vacinacoes,
-    ROUND(AVG(CAST(paciente_idade AS UNSIGNED)), 2) AS media_idade
+    ROUND(AVG(paciente_idade), 2) AS media_idade
 FROM vacinacao_ac
 WHERE paciente_idade IS NOT NULL
+  AND paciente_idade >= 0
+  AND paciente_idade <= 120
   AND paciente_endereco_nmMunicipio IS NOT NULL
   AND paciente_endereco_uf IS NOT NULL
 GROUP BY paciente_endereco_nmMunicipio, paciente_endereco_uf;
@@ -37,12 +39,14 @@ GROUP BY paciente_endereco_nmMunicipio, paciente_endereco_uf;
 
 query_ap = """
 SELECT
-    paciente_endereco_nmMunicipio,
-    paciente_endereco_uf,
+    paciente_endereco_nmMunicipio AS municipio,
+    paciente_endereco_uf AS uf,
     COUNT(*) AS total_vacinacoes,
-    ROUND(AVG(CAST(paciente_idade AS UNSIGNED)), 2) AS media_idade
+    ROUND(AVG(paciente_idade), 2) AS media_idade
 FROM vacinacao_ap
 WHERE paciente_idade IS NOT NULL
+  AND paciente_idade >= 0
+  AND paciente_idade <= 120
   AND paciente_endereco_nmMunicipio IS NOT NULL
   AND paciente_endereco_uf IS NOT NULL
 GROUP BY paciente_endereco_nmMunicipio, paciente_endereco_uf;
@@ -63,5 +67,10 @@ df_ap.to_csv("vacinas_ap_powerbi.csv", index=False, encoding="utf-8-sig")
 print("CSV do Acre gerado com sucesso!")
 print("CSV do Amapá gerado com sucesso!")
 
+print("\nAcre:")
 print(df_ac.head())
+print(df_ac["media_idade"].describe())
+
+print("\nAmapá:")
 print(df_ap.head())
+print(df_ap["media_idade"].describe())
