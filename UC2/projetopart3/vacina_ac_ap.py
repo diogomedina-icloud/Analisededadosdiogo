@@ -24,36 +24,38 @@ def obter_dados_do_banco(query):
 
 query_ac = """
 SELECT
-    paciente_idade,
-    paciente_enumSexoBiologico,
-    paciente_racaCor_valor,
     paciente_endereco_nmMunicipio,
     paciente_endereco_uf,
-    vacina_dataAplicacao,
-    vacina_categoria_nome,
-    vacina_grupoAtendimento_nome,
-    vacina_fabricante_nome,
-    sistema_origem
-FROM vacinacao_ac;
+    COUNT(*) AS total_vacinacoes,
+    ROUND(AVG(CAST(paciente_idade AS UNSIGNED)), 2) AS media_idade
+FROM vacinacao_ac
+WHERE paciente_idade IS NOT NULL
+  AND paciente_endereco_nmMunicipio IS NOT NULL
+  AND paciente_endereco_uf IS NOT NULL
+GROUP BY paciente_endereco_nmMunicipio, paciente_endereco_uf;
 """
 
 query_ap = """
 SELECT
-    paciente_idade,
-    paciente_enumSexoBiologico,
-    paciente_racaCor_valor,
     paciente_endereco_nmMunicipio,
     paciente_endereco_uf,
-    vacina_dataAplicacao,
-    vacina_categoria_nome,
-    vacina_grupoAtendimento_nome,
-    vacina_fabricante_nome,
-    sistema_origem
-FROM vacinacao_ap;
+    COUNT(*) AS total_vacinacoes,
+    ROUND(AVG(CAST(paciente_idade AS UNSIGNED)), 2) AS media_idade
+FROM vacinacao_ap
+WHERE paciente_idade IS NOT NULL
+  AND paciente_endereco_nmMunicipio IS NOT NULL
+  AND paciente_endereco_uf IS NOT NULL
+GROUP BY paciente_endereco_nmMunicipio, paciente_endereco_uf;
 """
 
 df_ac = obter_dados_do_banco(query_ac)
 df_ap = obter_dados_do_banco(query_ap)
+
+df_ac["estado"] = "AC"
+df_ac["regiao"] = "Norte"
+
+df_ap["estado"] = "AP"
+df_ap["regiao"] = "Norte"
 
 df_ac.to_csv("vacinas_ac_powerbi.csv", index=False, encoding="utf-8-sig")
 df_ap.to_csv("vacinas_ap_powerbi.csv", index=False, encoding="utf-8-sig")
